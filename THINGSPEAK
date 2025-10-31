@@ -1,0 +1,72 @@
+#include &lt;DHT.h&gt;  // Including library for dht
+ 
+#include &lt;ESP8266WiFi.h&gt;
+
+String apiKey = "H38TEGNC0XKW43BB";     //  Enter your Write API key from ThingSpeak
+ 
+const char *ssid =  "how2electronics";     // replace with your wifi ssid and wpa2 key
+const char *pass =  "alhabibi";
+const char* server = "api.thingspeak.com";
+ 
+#define DHTPIN 0          //pin where the dht11 is connected
+DHT dht(DHTPIN, DHT11);
+ 
+WiFiClient client;
+void setup()
+{
+       Serial.begin(115200);
+       delay(10);
+       dht.begin();
+       Serial.println("Connecting to ");
+       Serial.println(ssid);
+       WiFi.begin(ssid, pass);
+      while (WiFi.status() != WL_CONNECTED)
+     {
+            delay(500);
+            Serial.print(".");
+     }
+      Serial.println("");
+      Serial.println("WiFi connected");
+}
+void loop()
+{
+  
+      float h = dht.readHumidity();
+      float t = dht.readTemperature();
+      
+              if (isnan(h) || isnan(t))
+                 {
+                     Serial.println(&quot;Failed to read from DHT sensor!&quot;);
+                      return;
+                 }
+ 
+                         if (client.connect(server,80))   //   &quot;184.106.153.149&quot; or api.thingspeak.com
+                      {  
+                            
+                             String postStr = apiKey;
+                             postStr +=&quot;&amp;field1=&quot;;
+                             postStr += String(t);
+                             postStr +=&quot;&amp;field2=&quot;;
+                             postStr += String(h);
+                             postStr += &quot;\r\n\r\n&quot;;
+                             client.print(&quot;POST /update HTTP/1.1\n&quot;);
+                             client.print(&quot;Host: api.thingspeak.com\n&quot;);
+                             client.print(&quot;Connection: close\n&quot;);
+                             client.print(&quot;X-THINGSPEAKAPIKEY: &quot;+apiKey+&quot;\n&quot;);
+                             client.print(&quot;Content-Type: application/x-www-form-urlencoded\n&quot;);
+                             client.print(&quot;Content-Length: &quot;);
+                             client.print(postStr.length());
+                             client.print(&quot;\n\n&quot;);
+                             client.print(postStr);
+                             Serial.print(&quot;Temperature: &quot;);
+                             Serial.print(t);
+                             Serial.print(&quot; degrees Celcius, Humidity: &quot;);
+                             Serial.print(h);
+                             Serial.println(&quot;%. Send to Thingspeak.&quot;);
+                        }
+          client.stop();
+          Serial.println(&quot;Waiting...&quot;);
+  
+  // thingspeak needs minimum 15 sec delay between updates
+  delay(1000);
+}
