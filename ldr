@@ -1,0 +1,24 @@
+#define LDR_PIN A0         // LDR connected to analog pin A0
+#define LED_PIN 9           // LED connected to digital pin 9
+int lightValue = 0;         // Variable to store light intensity
+int threshold = 500;        // Predefined threshold (adjust as needed)
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  Serial.begin(9600);       // For debugging and monitoring sensor values
+}
+
+void loop() {
+  lightValue = analogRead(LDR_PIN);   // Read LDR value (0 - 1023)
+  Serial.print("Light Intensity: ");
+  Serial.println(lightValue);
+
+  // Compare the light value with threshold
+  if (lightValue < threshold) {
+    digitalWrite(LED_PIN, HIGH);   // Turn ON LED when it's dark
+  } else {
+    digitalWrite(LED_PIN, LOW);    // Turn OFF LED when it's bright
+  }
+
+  delay(500);  // Small delay for stability
+}
