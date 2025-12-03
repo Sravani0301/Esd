@@ -1,0 +1,56 @@
+// LED indicator pins
+#define LED1 12
+#define LED2 11
+#define LED3 10
+
+// Potentiometer pin
+int potPin = A0;
+
+// DC Motor PWM pin
+int motorPin = 9;
+
+int val;
+
+void setup() {
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
+  pinMode(motorPin, OUTPUT);
+}
+
+void loop() {
+
+  // Read potentiometer value (0–1023)
+  val = analogRead(potPin);
+
+  // Map value to 0–255 for motor speed
+  int motorSpeed = map(val, 0, 1023, 0, 255);
+
+  // Set motor speed through PWM
+  analogWrite(motorPin, motorSpeed);
+
+  // ----- LED Indicators for Speed Ranges -----
+
+  // High speed
+  if (motorSpeed > 170) {
+    digitalWrite(LED1, HIGH);
+  } else {
+    digitalWrite(LED1, LOW);
+  }
+
+  // Medium speed
+  if (motorSpeed > 100) {
+    digitalWrite(LED2, HIGH);
+  } else {
+    digitalWrite(LED2, LOW);
+  }
+
+  // Low speed
+  if (motorSpeed > 30) {
+    digitalWrite(LED3, HIGH);
+  } else {
+    digitalWrite(LED3, LOW);
+  }
+
+  delay(20);
+}
