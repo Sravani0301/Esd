@@ -1,0 +1,32 @@
+sudo apt update
+sudo apt upgrade -y
+sudo apt install python3-pip -y
+pip3 install feedparser
+pip3 install RPLCD
+sudo raspi-config
+sudo reboot
+import time
+import feedparser
+from RPLCD.i2c import CharLCD
+
+# Initialize LCD (change address 0x27 to your detected address if needed)
+lcd = CharLCD('PCF8574', 0x27)
+
+# RSS Feed URL (Example: BBC News)
+RSS_URL = "http://feeds.bbci.co.uk/news/rss.xml"
+
+while True:
+    # Fetch RSS Feed
+    feed = feedparser.parse(RSS_URL)
+
+    # Display first 5 headlines
+    for entry in feed.entries[:5]:
+        headline = entry.title
+
+        # Scroll long headlines across the LCD
+        for i in range(len(headline)):
+            lcd.clear()
+            lcd.write_string(headline[i:i+16])  # 16-character window
+            time.sleep(0.3)
+
+        time.sleep(1)
