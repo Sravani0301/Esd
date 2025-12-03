@@ -1,0 +1,21 @@
+#include <Stepper.h>
+
+#define STEPS 2048   // Steps per revolution for 28BYJ-48
+
+// Connect IN1, IN3, IN2, IN4 to pins 8, 10, 9, 11 respectively
+Stepper myStepper(STEPS, 8, 10, 9, 11);
+
+void setup() {
+  myStepper.setSpeed(10);  // Speed in RPM
+  Serial.begin(9600);
+}
+
+void loop() {
+  Serial.println("Clockwise Rotation");
+  myStepper.step(STEPS);      // Full clockwise rotation
+  delay(1000);
+
+  Serial.println("Counter-Clockwise Rotation");
+  myStepper.step(-STEPS);     // Full counter-clockwise rotation
+  delay(1000);
+}
