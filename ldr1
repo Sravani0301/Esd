@@ -1,0 +1,41 @@
+import RPi.GPIO as GPIO
+import time
+
+LED_PIN = 17      # LED pin
+LDR_PIN = 18      # LDR RC pin
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(LED_PIN, GPIO.OUT)
+
+def read_light(pin):
+    count = 0
+
+    # Discharge capacitor
+    GPIO.setup(pin, GPIO.OUT)
+    GPIO.output(pin, GPIO.LOW)
+    time.sleep(0.1)
+
+    # Charge through LDR
+    GPIO.setup(pin, GPIO.IN)
+
+    while GPIO.input(pin) == GPIO.LOW and count < 10000:
+        count += 1
+
+    return count
+
+THRESHOLD = 2000
+
+try:
+    while True:
+        light_value = read_light(LDR_PIN)
+        print("Light Value:", light_value)
+
+        if light_value > THRESHOLD:   # Dark
+            GPIO.output(LED_PIN, GPIO.HIGH)
+        else:                         # Bright
+            GPIO.output(LED_PIN, GPIO.LOW)
+
+        time.sleep(0.2)
+
+except KeyboardInterrupt:
+    GPIO.cleanup()
