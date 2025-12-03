@@ -1,0 +1,29 @@
+int ledPin = 13;          // LED pin
+int inputPin = 2;         // PIR sensor output pin
+int pirState = LOW;       // Assume no motion initially
+int val = 0;              // Variable to read the input status
+
+void setup() {
+  pinMode(ledPin, OUTPUT);     // LED as output
+  pinMode(inputPin, INPUT);    // PIR sensor as input
+  Serial.begin(9600);          // Initialize Serial monitor
+}
+
+void loop() {
+  val = digitalRead(inputPin);   // Read PIR sensor output
+
+  if (val == HIGH) {             // Motion detected
+    digitalWrite(ledPin, HIGH);  // Turn LED ON
+    if (pirState == LOW) {
+      Serial.println("Motion detected!");
+      pirState = HIGH;
+    }
+  } 
+  else {                         // No motion
+    digitalWrite(ledPin, LOW);   // Turn LED OFF
+    if (pirState == HIGH) {
+      Serial.println("Motion ended!");
+      pirState = LOW;
+    }
+  }
+}
