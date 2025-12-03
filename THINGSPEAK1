@@ -1,0 +1,82 @@
+#include <DHT.h>              // DHT Sensor Library
+#include <ESP8266WiFi.h>      // WiFi Library for ESP8266
+
+// ThingSpeak Write API Key
+String apiKey = "H38TEGNC0XKW43BB";  // Replace with your Write API Key
+
+// WiFi credentials
+const char* ssid = "how2electronics";   // Replace with your SSID
+const char* pass = "alhabibi";          // Replace with your password
+
+// ThingSpeak Server
+const char* server = "api.thingspeak.com";
+
+// DHT Sensor
+#define DHTPIN 0       // D3 pin on ESP8266
+DHT dht(DHTPIN, DHT11);
+
+WiFiClient client;
+
+void setup() {
+  Serial.begin(115200);
+  delay(10);
+
+  dht.begin();
+  
+  Serial.println();
+  Serial.println("Connecting to WiFi...");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, pass);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println();
+  Serial.println("WiFi Connected!");
+}
+
+void loop() {
+
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+
+  // Check if valid readings
+  if (isnan(h) || isnan(t)) {
+    Serial.println("Failed to read from DHT11 sensor!");
+    return;
+  }
+
+  if (client.connect(server, 80)) {
+    String postStr = apiKey;
+    postStr += "&field1=";
+    postStr += String(t);
+    postStr += "&field2=";
+    postStr += String(h);
+    postStr += "\r\n\r\n";
+
+    client.print("POST /update HTTP/1.1\n");
+    client.print("Host: api.thingspeak.com\n");
+    client.print("Connection: close\n");
+    client.print("X-THINGSPEAKAPIKEY: " + apiKey + "\n");
+    client.print("Content-Type: application/x-www-form-urlencoded\n");
+    client.print("Content-Length: ");
+    client.print(postStr.length());
+    client.print("\n\n");
+    client.print(postStr);
+
+    Serial.print("Temperature: ");
+    Serial.print(t);
+    Serial.print(" °C | Humidity: ");
+    Serial.print(h);
+    Serial.println(" %. Sent to ThingSpeak.");
+  }
+
+  client.stop();
+  Serial.println("Waiting...");
+
+  // ThingSpeak Rule: Minimum 15 seconds between uploads
+  delay(15000);
+}
