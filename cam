@@ -1,0 +1,13 @@
+lsusb
+ls /dev/video0
+sudo apt update  
+sudo apt upgrade -y
+sudo apt install git cmake g++ build-essential libjpeg-dev
+git clone https://github.com/jacksonliam/mjpg-streamex-git
+cd mjpg-streamer/mjpg-streamer-experimental 
+sudo apt update
+sudo apt install cmake -y
+sudo apt install libjpeg-dev -y
+make clean
+sudo make install
+./mjpg_streamer -i "./input_uvc.so -d /dev/video0 -r 640x480 -f 30" -o " /output_http.so -w ./www"
