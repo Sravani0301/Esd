@@ -1,0 +1,19 @@
+const int BUTTON = 4;   // Pushbutton pin
+const int LED = 6;      // LED pin
+int BUTTONstate = 0;    
+
+void setup() {
+  pinMode(BUTTON, INPUT);   // Button as input
+  pinMode(LED, OUTPUT);     // LED as output
+}
+
+void loop() {
+  BUTTONstate = digitalRead(BUTTON);  // Read button state
+
+  if (BUTTONstate == HIGH) {
+    digitalWrite(LED, HIGH);   // Turn ON LED
+  }
+  else {
+    digitalWrite(LED, LOW);    // Turn OFF LED
+  }
+}
